@@ -1,0 +1,5 @@
+protoc -I=. --cpp_out=. ./schema.proto 
+protoc -I=. --python_out=. ./schema.proto 
+g++ -o ser ser.cpp schema.pb.cc -std=c++11 -lprotobuf -pthread
+./ser
+python3 cli.py

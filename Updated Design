@@ -1,0 +1,73 @@
+Element of the game
+ Troops
+ Miners
+ Farmers
+ Engineers
+ Spies
+ Food
+ Raw Materials
+
+Functions to be coded by players:
+
+ResouceAllocator():
+  Each player is alloacted 100 food points, 100 raw materials and 1 10x10 grid of land
+  
+  Initially the player must allocate these resources to different things
+  Troop - 1 food point
+  Miner - 1 food point
+  Farmer - 1 food point
+  Engineer - 2 food point
+  Spy - 2 food point
+  
+  Note that troops die in combat and their number will grow automatically depending on food production in the future
+  Other specializations don't die in combat and their numbers don't grow automatically. They can only be increased
+  in the future by capturing other clans.
+  
+  Initial defence = x raw materials
+  Initial Offence = 100-x raw materials
+  //x has to be decided by the user
+  
+  Now the rate of generation will be:
+    FoodGeneratadPerSecond = f ( land, farmers )
+    RawMaterialsPerSecond = f ( land, miners )
+    AttackCapabilitesCreatedPerSecond = f ( engineers , raw materials ) * fraction
+    DefenceCapabilitiesCreatedPerSecond = f ( engineers , raw materials ) * (1-fraction)
+    The fraction has to be decided by user
+
+DefenceStrategy():
+ Rules:
+  Each area of land is either green, red or yellow
+  In any area of land if you choose to deploy more troops than the enemy, then you always win. But those troops then have
+  to stay in the same area till end of war. (They cannot be reused)
+  
+  As your defence capabilites increase, you have to startegically make more areas red or yellow
+  1 red = 2 defence points
+  1 yellow = 1 defence point
+  
+  or you can use defence points to capture spies and send them back (you cannot kill them)
+  1 spy capture = 5 defence points
+  
+  or you can use defence points to increase your kingdom morale (percentage of land that has to be captured for you
+  to surrender)
+  
+AttackStrategy():
+  Every second you have to Choose which kingdom to attack or to not attack at all
+  
+  Once you have started the attack, you have to decide based on your spy data and logic
+  Where to place your troops
+  Where to deploy your attackcapabilites
+  
+  (attackcapabilites can be something like a bomb, which will destroy the defence equipment and make the area
+  from red/yellow to green)
+  
+  You also need to decide everysecond, whether to continue the attack or abort
+  If you abort:
+    All your troops which you used in war which are dead are left to rot, and the ones alive come back.
+    You do not gain any terriroty
+  If you win:
+    Either by enemy troops falling below a certain limit
+    or Capturing a certain percentage of the enemy area
+    All the leftover enemy troops, engineers, food, land etc become yours
+
+SpyDeployer():
+  Create a function which deploys spies effectively to send you data of relevant kingdoms.
