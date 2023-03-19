@@ -21,20 +21,17 @@
 #include <utility>
 #include "protocol.hpp"
 #include <jsoncpp/json/json.h>
-#include "GameFactors.h"
+#include "../GameLogic/GameFactors.h"
 #include <cstring>
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <vector>
 #include <cstdlib>
-
+#
 using boost::asio::ip::tcp;
 
 int i=0;
-
-
-Kingdom arr[4];
 
 // create the window
     sf::RenderWindow window(sf::VideoMode(1000, 1000), "My window");
@@ -50,6 +47,18 @@ std::vector <coord> troopCoords1;
 std::vector <coord> troopCoords2;
 std::vector <coord> troopCoords3;
 std::vector <coord> troopCoords4;
+std::vector <coord> engineerCoords1;
+std::vector <coord> engineerCoords2;
+std::vector <coord> engineerCoords3;
+std::vector <coord> engineerCoords4;
+std::vector <coord> farmerCoords1;
+std::vector <coord> farmerCoords2;
+std::vector <coord> farmerCoords3;
+std::vector <coord> farmerCoords4;
+std::vector <coord> minerCoords1;
+std::vector <coord> minerCoords2;
+std::vector <coord> minerCoords3;
+std::vector <coord> minerCoords4;
 std::vector <coord> spyCoords1;
 std::vector <coord> spyCoords2;
 std::vector <coord> spyCoords3;
@@ -260,6 +269,78 @@ class Troop{
     }
 };
 
+class Farmer{
+    sf::RenderWindow *window;
+    sf::Texture *Texture;
+    sf::Sprite* sprite = new sf::Sprite();
+    
+    public:
+    Farmer(sf::RenderWindow *win, sf::Texture *Texture){
+        this->Texture = Texture;
+        this->window = win;
+        sprite->setTexture(*Texture);
+        sprite->setScale( 40.0/182 , 50.0/277 );
+        //std::cout << "here\n";
+    }
+
+    /// @brief x and y are not exact coordinates. Assume that the mapp is divided into 20x20 square
+    /// @param x from 0 to 19
+    /// @param y from 0 to 19
+    void drawFarmer(int x, int y){
+        sprite->setPosition(x*50,y*50);
+        window->draw(*sprite);
+    }
+
+};
+
+class Engineer{
+    sf::RenderWindow *window;
+    sf::Texture *Texture;
+    sf::Sprite* sprite = new sf::Sprite();
+    
+    public:
+    Engineer(sf::RenderWindow *win, sf::Texture *Texture){
+        this->Texture = Texture;
+        this->window = win;
+        sprite->setTexture(*Texture);
+        sprite->setScale( 40.0/182 , 50.0/277 );
+        //std::cout << "here\n";
+    }
+
+    /// @brief x and y are not exact coordinates. Assume that the mapp is divided into 20x20 square
+    /// @param x from 0 to 19
+    /// @param y from 0 to 19
+    void drawEngineer(int x, int y){
+        sprite->setPosition(x*50,y*50);
+        window->draw(*sprite);
+    }
+
+};
+
+class Miner{
+    sf::RenderWindow *window;
+    sf::Texture *Texture;
+    sf::Sprite* sprite = new sf::Sprite();
+    
+    public:
+    Miner(sf::RenderWindow *win, sf::Texture *Texture){
+        this->Texture = Texture;
+        this->window = win;
+        sprite->setTexture(*Texture);
+        sprite->setScale( 40.0/182 , 50.0/277 );
+        //std::cout << "here\n";
+    }
+
+    /// @brief x and y are not exact coordinates. Assume that the mapp is divided into 20x20 square
+    /// @param x from 0 to 19
+    /// @param y from 0 to 19
+    void drawMiner(int x, int y){
+        sprite->setPosition(x*50,y*50);
+        window->draw(*sprite);
+    }
+
+};
+
 class Spy{
     sf::RenderWindow *window;
     sf::Texture *Texture;
@@ -345,8 +426,10 @@ public:
         name_table_[participant] = nickname;
         if(i<4){
             arr[i] = participant->k;
-            participant->num=i;
-            arr[i].num = i;
+            //std::cout<<"Here"<<std::endl;
+            participant->num=std::stoi(nickname.data());
+            arr[i].num = std::stoi(nickname.data());
+            std::cout<<"wow"<<std::endl;
             i++;
         }
         else{
@@ -459,7 +542,7 @@ private:
                 s[k]= read_msg_[k];
                 k++;
             }
-            //std::cout<<s<<std::endl;
+            std::cout<<s<<std::endl;
             char *c1 = strtok(s, ":");
             char *c2 =strtok(NULL, ":");
             char *c3 = strtok(NULL, ":");
@@ -475,46 +558,72 @@ private:
             //if(c1 == "pm"){
             //    shared_from_this()->k.produce_material(std::stoi(c2), std::stoi(c3));
             //}
+
             if(!shared_from_this()->k.lost){
                 if(std::strcmp(c1,"rf") == 0){
                     bool x = shared_from_this()->k.recruit_farmers(std::stoi(c2));
                     if(x){
+                        if(shared_from_this()->num == 0)
+                            farmerCoords1.push_back(coord(rand()%2 +7, rand()%8 + 1));
+                        else if(shared_from_this()->num == 1)
+                            farmerCoords2.push_back(coord((rand()%2)+17, rand()%8 + 1));
+                        else if(shared_from_this()->num == 2)
+                            farmerCoords3.push_back(coord(rand()%2 + 7, (rand()%8)+11));
+                        else if(shared_from_this()->num == 3)
+                            farmerCoords4.push_back(coord((rand()%2 + 17), (rand()%8)+11));
                     }
                 }
                 else if(std::strcmp(c1,"re") == 0){
                     bool x = shared_from_this()->k.recruit_engineers(std::stoi(c2));
-                    if(x){  
+                    if(x){
+                        if(shared_from_this()->num == 0)
+                            engineerCoords1.push_back(coord(rand()%2 +1, rand()%8 + 1));
+                        else if(shared_from_this()->num == 1)
+                            engineerCoords2.push_back(coord((rand()%2)+11, rand()%8 + 1));
+                        else if(shared_from_this()->num == 2)
+                            engineerCoords3.push_back(coord(rand()%2 + 1, (rand()%8)+11));
+                        else if(shared_from_this()->num == 3)
+                            engineerCoords4.push_back(coord((rand()%2 + 11), (rand()%8)+11));  
                     }
                 }
                 else if(std::strcmp(c1,"rt") == 0){
+                    //std::cout<<"Here"<<std::endl;
                     bool x = shared_from_this()->k.recruit_troops(std::stoi(c2));
                     if(x){
                         if(shared_from_this()->num == 0)
-                            troopCoords1.push_back(coord(rand()%8 +1, rand()%8 + 1));
+                            troopCoords1.push_back(coord(rand()%2 +7, rand()%8 + 1));
                         else if(shared_from_this()->num == 1)
-                            troopCoords2.push_back(coord((rand()%8)+11, rand()%8 + 1));
+                            troopCoords2.push_back(coord((rand()%2)+17, rand()%8 + 1));
                         else if(shared_from_this()->num == 2)
-                            troopCoords3.push_back(coord(rand()%8 + 1, (rand()%8)+11));
+                            troopCoords3.push_back(coord(rand()%2 + 7, (rand()%8)+11));
                         else if(shared_from_this()->num == 3)
-                            troopCoords4.push_back(coord((rand()%8 + 1)+10, (rand()%8)+11));
+                            troopCoords4.push_back(coord((rand()%2 + 17), (rand()%8)+11));
                     }
                 }
                 else if(std::strcmp(c1,"rm") == 0){
                     bool x = shared_from_this()->k.recruit_miners(std::stoi(c2));
                     if(x){
+                        if(shared_from_this()->num == 0)
+                            minerCoords1.push_back(coord(rand()%2 +3, rand()%8 + 1));
+                        else if(shared_from_this()->num == 1)
+                            minerCoords2.push_back(coord((rand()%2)+13, rand()%8 + 1));
+                        else if(shared_from_this()->num == 2)
+                            minerCoords3.push_back(coord(rand()%2 + 3, (rand()%8)+11));
+                        else if(shared_from_this()->num == 3)
+                            minerCoords4.push_back(coord((rand()%2 + 13), (rand()%8)+11));
                     }
                 }
                 else if(std::strcmp(c1,"rs") == 0){
                     bool x = shared_from_this()->k.recruit_spies(std::stoi(c2));
                     if(x){
                         if(shared_from_this()->num == 0)
-                            spyCoords1.push_back(coord(rand()%8 +1, rand()%8 + 1));
+                            spyCoords1.push_back(coord(rand()%2 +5, rand()%8 + 1));
                         else if(shared_from_this()->num == 1)
-                            spyCoords2.push_back(coord((rand()%8)+11, rand()%8 + 1));
+                            spyCoords2.push_back(coord((rand()%2)+15, rand()%8 + 1));
                         else if(shared_from_this()->num == 2)
-                            spyCoords3.push_back(coord(rand()%8 + 1, (rand()%8)+11));
+                            spyCoords3.push_back(coord(rand()%2 + 5, (rand()%8)+11));
                         else if(shared_from_this()->num == 3)
-                            spyCoords4.push_back(coord((rand()%8 + 1)+10, (rand()%8)+11));
+                            spyCoords4.push_back(coord((rand()%2 + 15), (rand()%8)+11));
                     }
                 }
                 else if(std::strcmp(c1,"ia") == 0){
@@ -526,13 +635,20 @@ private:
                 else if(std::strcmp(c1,"sa") == 0){
                     shared_from_this()->k.square_assign(std::stoi(c2), std::stoi(c3), *c4);
                 }
-                if(std::strcmp(c1,"sc") == 0){
+                else if(std::strcmp(c1,"sc") == 0){
                     shared_from_this()->k.spy_capture(&arr[std::stoi(c2)], std::stoi(c3));
                 }
                 else if(std::strcmp(c1,"ds") == 0){
                     shared_from_this()->k.deploySpy(std::stoi(c2),&arr[std::stoi(c3)]);
                 }
                 else if(std::strcmp(c1, "at") == 0){
+                    int z = std::stoi(c2);
+                    if(std::stoi(c2) == shared_from_this()->num){
+                        z=(z+1)%4;
+                        while(arr[z].lost){
+                            z=(z+1)%4;
+                        }
+                    }
                     int x = shared_from_this()->k.attack(&(arr[std::stoi(c2)]), std::stoi(c3));
                     if(x>100){
                         x=100;
@@ -557,15 +673,13 @@ private:
                     }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                 }
             }
-
+            else{
+                room_.leave(shared_from_this());
+            }
 
             boost::asio::async_read(socket_,
                                     boost::asio::buffer(read_msg_, read_msg_.size()),
                                     strand_.wrap(boost::bind(&personInRoom::readHandler, shared_from_this(), _1)));
-        }
-        else
-        {
-            room_.leave(shared_from_this());
         }
     }
 
@@ -640,7 +754,7 @@ int winLoop(){
                 counter++;
             }
             else{
-                store=s;
+                store=arr[s].num;
             }
         }
         if(counter == 3){
@@ -700,7 +814,7 @@ int main(int argc, char * argv[])
 {
     if (argc < 2)
         {
-            std::cerr << "Usage: chat_server <port> [<port> ...]\n";
+            std::cerr << "Usage: main <port> [<port> ...]\n";
             return 1;
         }
     
@@ -708,40 +822,49 @@ int main(int argc, char * argv[])
     
     //Grass Texture
     sf::Texture grassTexture;
-    if (!grassTexture.loadFromFile("grass3.jpg")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!grassTexture.loadFromFile("../Graphics/grass3.jpg")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
     grassTexture.setRepeated(true);
 
     //Stone Texture
     sf::Texture stoneTexture;
-    if (!stoneTexture.loadFromFile("stone.jpg")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!stoneTexture.loadFromFile("../Graphics/stone.jpg")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
     
     //Defence Texture
     sf::Texture defenceTexture;
-    if (!defenceTexture.loadFromFile("defence.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!defenceTexture.loadFromFile("../Graphics/defence.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //Attack Texture
     sf::Texture attackTexture;
-    if (!attackTexture.loadFromFile("attack.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!attackTexture.loadFromFile("../Graphics/attack.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //Red Texture
     sf::Texture redTexture;
-    if (!redTexture.loadFromFile("red.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!redTexture.loadFromFile("../Graphics/red.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //Yellow Texture
     sf::Texture yellowTexture;
-    if (!yellowTexture.loadFromFile("yellow.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!yellowTexture.loadFromFile("../Graphics/yellow.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //AttackTroop Texture
     sf::Texture attackTroop;
-    if (!attackTroop.loadFromFile("attackTroop.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!attackTroop.loadFromFile("../Graphics/attackTroop.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
     
     //DefenceTroop Texture
     sf::Texture defenceTroop;
-    if (!defenceTroop.loadFromFile("defenceTroop.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!defenceTroop.loadFromFile("../Graphics/defenceTroop.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //Spy Texture
     sf::Texture spyTexture;
-    if (!spyTexture.loadFromFile("spy.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+    if (!spyTexture.loadFromFile("../Graphics/spy.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+
+    sf::Texture farmerTexture;
+    if (!farmerTexture.loadFromFile("../Graphics/farmer1.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+
+    sf::Texture engineerTexture;
+    if (!engineerTexture.loadFromFile("../Graphics/engineer.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
+
+    sf::Texture minerTexture;
+    if (!minerTexture.loadFromFile("../Graphics/miner1.png")){std::cout << "Error Occurred!! Image could not be loaded!\n";}
 
     //Grass is initialized
     Grass* grass = new Grass(&grassTexture,&attackTexture,&defenceTexture,&window);
@@ -766,6 +889,12 @@ int main(int argc, char * argv[])
 
     //Spies initialized
     Spy* spy1 = new Spy(&window,&spyTexture);
+
+    Farmer* farmer2 = new Farmer(&window,&farmerTexture);
+
+    Engineer* engineer2 = new Engineer(&window,&engineerTexture);
+
+    Miner* miner2 = new Miner(&window,&minerTexture);
 
     // run the program as long as the window is open
 
@@ -838,6 +967,30 @@ int main(int argc, char * argv[])
             troop2->drawTroop(troopCoords3[o].x, troopCoords3[o].y);
         for(unsigned int o = 0; o<troopCoords4.size(); o++)
             troop2->drawTroop(troopCoords4[o].x, troopCoords4[o].y);
+        for(unsigned int o = 0; o<farmerCoords1.size(); o++)
+            farmer2->drawFarmer(farmerCoords1[o].x, farmerCoords1[o].y);
+        for(unsigned int o = 0; o<farmerCoords2.size(); o++)
+            farmer2->drawFarmer(farmerCoords2[o].x, farmerCoords2[o].y);
+        for(unsigned int o = 0; o<farmerCoords3.size(); o++)
+            farmer2->drawFarmer(farmerCoords3[o].x, farmerCoords3[o].y);
+        for(unsigned int o = 0; o<farmerCoords4.size(); o++)
+            farmer2->drawFarmer(farmerCoords4[o].x, farmerCoords4[o].y);
+        for(unsigned int o = 0; o<engineerCoords1.size(); o++)
+            engineer2->drawEngineer(engineerCoords1[o].x, engineerCoords1[o].y);
+        for(unsigned int o = 0; o<engineerCoords2.size(); o++)
+            engineer2->drawEngineer(engineerCoords2[o].x, engineerCoords2[o].y);
+        for(unsigned int o = 0; o<engineerCoords3.size(); o++)
+            engineer2->drawEngineer(engineerCoords3[o].x, engineerCoords3[o].y);
+        for(unsigned int o = 0; o<engineerCoords4.size(); o++)
+            engineer2->drawEngineer(engineerCoords4[o].x, engineerCoords4[o].y);
+        for(unsigned int o = 0; o<minerCoords1.size(); o++)
+            miner2->drawMiner(minerCoords1[o].x, minerCoords1[o].y);
+        for(unsigned int o = 0; o<minerCoords2.size(); o++)
+            miner2->drawMiner(minerCoords2[o].x, minerCoords2[o].y);
+        for(unsigned int o = 0; o<minerCoords3.size(); o++)
+            miner2->drawMiner(minerCoords3[o].x, minerCoords3[o].y);
+        for(unsigned int o = 0; o<minerCoords4.size(); o++)
+            miner2->drawMiner(minerCoords4[o].x, minerCoords4[o].y);
         window.display();
     }
     t1.join();
